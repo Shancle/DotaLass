@@ -2,7 +2,7 @@
   "AutoRetrievePlayerData": true,
   "PreferredSite": 0,
   "RecentMatchesDateLimit": 3,
-  "RankedMatchesOnly": false,
+  "RankedMatchesOnly": true,
   "FieldSettings": [
     {
       "Item1": "Profile",
@@ -13,15 +13,23 @@
       "Item2": true
     },
     {
-      "Item1": "Solo MMR",
+      "Item1": "Rank Tier",
       "Item2": true
+    },
+    {
+      "Item1": "Solo MMR",
+      "Item2": false
     },
     {
       "Item1": "Estimate MMR",
-      "Item2": true
+      "Item2": false
     },
     {
       "Item1": "Winrate",
+      "Item2": true
+    },
+    {
+      "Item1": "KDA",
       "Item2": true
     },
     {

@@ -44,9 +44,11 @@ namespace DotaLass.FieldManagement
             {
                 case "Profile": return new FieldInfo(visible, new ProfileLinkField(Window, key));
                 case "Notes": return new FieldInfo(visible, new NotesField(Window, key));
+                case "Rank Tier": return new FieldInfo(visible, new RankTierIconField(Window, key));
                 case "Solo MMR": return new FieldInfo(visible, new StringField(Window, nameof(PlayerDisplay.DisplayData.SoloMMR), key, 120));
                 case "Estimate MMR": return new FieldInfo(visible, new StringField(Window, nameof(PlayerDisplay.DisplayData.EstimateMMR), key, 120));
                 case "Winrate": return new FieldInfo(visible, new FloatField(Window, nameof(PlayerDisplay.DisplayData.Winrate), key, 100, "0.#%"));
+                case "KDA": return new FieldInfo(visible, new FloatField(Window, nameof(PlayerDisplay.DisplayData.AverageKda), key, 50));
                 case "K": return new FieldInfo(visible, new FloatField(Window, nameof(PlayerDisplay.DisplayData.AverageKills), key, 50));
                 case "D": return new FieldInfo(visible, new FloatField(Window, nameof(PlayerDisplay.DisplayData.AverageDeaths), key, 50));
                 case "A": return new FieldInfo(visible, new FloatField(Window, nameof(PlayerDisplay.DisplayData.AverageAssists), key, 50));

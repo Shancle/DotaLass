@@ -13,6 +13,7 @@ namespace DotaLass.API.Outputs
         public object competitive_rank { get; set; }
         public MmrEstimate mmr_estimate { get; set; }
         public Profile profile { get; set; }
+        public int? rank_tier { get; set; }
     }
 
     public class MmrEstimate

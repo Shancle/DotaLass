@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using DotaLass.API.Enums;
 
 namespace DotaLass.API
 {
@@ -76,10 +77,12 @@ namespace DotaLass.API
             public string Name { get; private set; }
             public string SoloMMR { get; private set; }
             public string EstimateMMR { get; private set; }
+            public RankTier? RankTier { get; private set; }
 
             public float Winrate { get; private set; }
             public TimeSpan AverageDuration { get; private set; }
             public Match[] RecentMatches { get; private set; }
+            public float AverageKda { get; private set; }
             public float AverageKills { get; private set; }
             public float AverageDeaths { get; private set; }
             public float AverageAssists { get; private set; }
@@ -109,12 +112,14 @@ namespace DotaLass.API
                     Name = "Anonymous";
                     SoloMMR = "X";
                     EstimateMMR = "X";
+                    RankTier = null;
                 }
                 else
                 {
                     Name = playerData.profile.personaname;
                     SoloMMR = playerData.solo_competitive_rank ?? "X";
                     EstimateMMR = playerData.mmr_estimate.estimate.HasValue ? playerData.mmr_estimate.estimate.ToString() : "X";
+                    RankTier = playerData.rank_tier.HasValue ? (RankTier?)playerData.rank_tier.Value : null;
                 }
 
                 NotifyUpdateProfile();
@@ -164,6 +169,7 @@ namespace DotaLass.API
                     AverageKills = totalKills / recentMatches.Length;
                     AverageDeaths = totalDeaths / recentMatches.Length;
                     AverageAssists = totalAssists / recentMatches.Length;
+                    AverageKda = (AverageKills + AverageAssists) / (AverageDeaths == 0 ? 1 : AverageDeaths);
                     AverageXPM = totalXPM / recentMatches.Length;
                     AverageGPM = totalGPM / recentMatches.Length;
                     AverageHeroDamage = totalHeroDamage / recentMatches.Length;
@@ -182,10 +188,12 @@ namespace DotaLass.API
                 Name = "";
                 SoloMMR = "";
                 EstimateMMR = "";
+                RankTier = null;
 
                 Winrate = 0;
                 AverageDuration = TimeSpan.Zero;
                 RecentMatches = null;
+                AverageKda = 0;
                 AverageKills = 0;
                 AverageDeaths = 0;
                 AverageAssists = 0;
@@ -209,6 +217,7 @@ namespace DotaLass.API
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EstimateMMR)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SoloMMR)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RankTier)));
             }
 
             private void NotifyUpdateMatches()
@@ -219,6 +228,7 @@ namespace DotaLass.API
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageKills)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageDeaths)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageAssists)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageKda)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageXPM)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageGPM)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AverageHeroDamage)));
