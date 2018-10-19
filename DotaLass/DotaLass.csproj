@@ -88,6 +88,7 @@
     </ApplicationDefinition>
     <Compile Include="API\Enums\RankTier.cs" />
     <Compile Include="API\Outputs\Match.cs" />
+    <Compile Include="API\Outputs\PlayerPeer.cs" />
     <Compile Include="API\PlayerNotes.cs" />
     <Compile Include="API\RankTierIcons.cs" />
     <Compile Include="API\Settings.cs" />

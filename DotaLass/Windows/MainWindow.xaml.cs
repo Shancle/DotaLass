@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -87,7 +88,7 @@ namespace DotaLass.Windows
                 }
             };
         }
-        
+
         private void RetrieveData()
         {
             this.Dispatcher.Invoke(() =>
@@ -96,25 +97,38 @@ namespace DotaLass.Windows
             });
 
             var playerIDs = OpenDotaAPI.GetPlayerIDs();
-            
+            var groups = GetPlayersGroups(playerIDs);
             for (int i = 0; i < 10; i++)
             {
                 if (i < playerIDs.Count)
-                    PlayerDisplays[i].Update(playerIDs[i]);
+                    PlayerDisplays[i].Update(playerIDs[i], groups);
                 else
-                    PlayerDisplays[i].Update("");
+                    PlayerDisplays[i].Update("", groups);
             }
         }
 
+        private static List<List<string>> GetPlayersGroups(List<string> playerIds)
+        {
+            if (!playerIds.SequenceEqual(_lastIds))
+            {
+                _playerGroups = OpenDotaAPI.GetPlayersPartiesList(playerIds);
+                _lastIds = playerIds;
+            }
+
+            return _playerGroups;
+        }
+
+        private static List<string> _lastIds = new List<string>();
+        private static List<List<string>> _playerGroups = new List<List<string>>();
 
         int runningRetrievals = 0;
         private void PlayerDisplay_RetrievalStarted(object sender, EventArgs e)
         {
-            runningRetrievals++;
+            Interlocked.Increment(ref runningRetrievals);
         }
         private void PlayerDisplay_RetrievalCompleted(object sender, EventArgs e)
         {
-            runningRetrievals--;
+            Interlocked.Decrement(ref runningRetrievals);
             this.Dispatcher.Invoke(() =>
             {
                 RefreshSpinner.Spin = runningRetrievals != 0;

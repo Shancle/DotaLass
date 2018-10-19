@@ -23,6 +23,10 @@ namespace DotaLass.FieldManagement.FieldGenerators.Fields
                         {
                             image.Source = RankTierIcons.GetRankTierIcon(playerDisplay.Data.RankTier);
                         }
+                        else
+                        {
+                            image.Source = RankTierIcons.BlankRankTierIcon;
+                        }
                     });
             };
 

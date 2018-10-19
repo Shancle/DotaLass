@@ -29,7 +29,7 @@ namespace DotaLass.API
 
         private CancellationTokenSource CTSource { get; set; }
 
-        public void Update(string playerID)
+        public void Update(string playerID, List<List<string>> groupsList)
         {
             Data.Clear();
 
@@ -51,8 +51,9 @@ namespace DotaLass.API
                     recentMatches = OpenDotaAPI.GetPlayerMatches(playerID, 20, Settings.Instance.GetDaysLimit(), Settings.Instance.GetLobbyType());
 
                 if (!cancelToken.IsCancellationRequested)
-                    Data.ConsumeData(playerID, playerData, recentMatches);
-
+                {
+                    Data.ConsumeData(playerID, playerData, recentMatches, groupsList);
+                }
             }, cancelToken).ContinueWith((t) =>
             {
                 RetrievalCompleted?.Invoke(this, null);
@@ -92,17 +93,24 @@ namespace DotaLass.API
             public float AverageTowerDamage { get; private set; }
             public float AverageHeroHealing { get; private set; }
             public float AverageLastHits { get; private set; }
+            public int PartyId { get; private set; }
 
             public event PropertyChangedEventHandler PropertyChanged;
 
-            public void ConsumeData(string id, PlayerData playerData, Match[] recentMatches)
+            public void ConsumeData(string id, PlayerData playerData, Match[] recentMatches, List<List<string>> groupsList)
             {
                 ID = id;
 
                 NotifyUpdateLocal();
 
+                UpdateGroups(groupsList);
                 ConsumePlayerData(playerData);
                 ConsumeRecentMatches(recentMatches);
+            }
+
+            public void UpdateGroups(List<List<string>> groupsList)
+            {
+                PartyId = groupsList.FindIndex(e => e.Contains(ID));
             }
 
             private void ConsumePlayerData(PlayerData playerData)
@@ -113,10 +121,11 @@ namespace DotaLass.API
                     SoloMMR = "X";
                     EstimateMMR = "X";
                     RankTier = null;
+                    PartyId = -1;
                 }
                 else
                 {
-                    Name = playerData.profile.personaname;
+                    Name = playerData.profile.personaname + (PartyId == -1 ? String.Empty : $" | group: {PartyId}");
                     SoloMMR = playerData.solo_competitive_rank ?? "X";
                     EstimateMMR = playerData.mmr_estimate.estimate.HasValue ? playerData.mmr_estimate.estimate.ToString() : "X";
                     RankTier = playerData.rank_tier.HasValue ? (RankTier?)playerData.rank_tier.Value : null;
@@ -189,6 +198,7 @@ namespace DotaLass.API
                 SoloMMR = "";
                 EstimateMMR = "";
                 RankTier = null;
+                PartyId = -1;
 
                 Winrate = 0;
                 AverageDuration = TimeSpan.Zero;
@@ -218,6 +228,7 @@ namespace DotaLass.API
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EstimateMMR)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SoloMMR)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RankTier)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PartyId)));
             }
 
             private void NotifyUpdateMatches()

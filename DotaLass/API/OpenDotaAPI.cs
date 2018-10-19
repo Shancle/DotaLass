@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace DotaLass.API
 {
     public static class OpenDotaAPI
     {
+        private static readonly Dictionary<string, PlayerPeer[]> PlayerPeersCache = new Dictionary<string, PlayerPeer[]>();
+
         public static PlayerData GetPlayerData(string playerID)
         {
             string result = RequestHandler.GET($"https://api.opendota.com/api/players/{playerID}");
@@ -20,6 +23,59 @@ namespace DotaLass.API
                 return JsonConvert.DeserializeObject<PlayerData>(result);
             else
                 return null;
+        }
+
+        public static PlayerPeer[] GetPlayerPeers(string playerID)
+        {
+            if (PlayerPeersCache.ContainsKey(playerID))
+                return PlayerPeersCache[playerID];
+            var requestString = $@"https://api.opendota.com/api/players/{playerID}/peers?sort=""with_games""";
+            var result = RequestHandler.GET(requestString);
+            if (result != null)
+            {
+                PlayerPeersCache.Add(playerID, JsonConvert.DeserializeObject<PlayerPeer[]>(result));
+                return PlayerPeersCache[playerID];
+            }
+            else
+                return null;
+        }
+
+        public static List<List<string>> GetPlayersPartiesList(List<string> playersIds)
+        {
+            if(playersIds == null)
+                return new List<List<string>>();
+            //var friends = playersIds.Select(e => Tuple.Create(e, GetPlayerPeers(e))).ToArray();
+            var friends = playersIds.AsParallel().Select(e => Tuple.Create(e, GetPlayerPeers(e))).ToArray();
+            var playerIdToPeers = friends.ToDictionary(e => e.Item1,
+                e => e.Item2
+                    .Where(x => x.WithGames >= 5 && x.AgainstGames <= 2 && playersIds.Contains(x.AccountId.ToString()))
+                    .Select(x => x.AccountId.ToString()).ToArray());
+            var result = new List<List<string>>();
+            var hashSet = new HashSet<string>();
+            foreach (var playerId in playersIds)
+            {
+                if (hashSet.Contains(playerId))
+                    continue;
+                var group = GetFullSubset(playerIdToPeers, new[] {playerId}).ToList();
+                if(group.Count < 2)
+                    continue;
+                result.Add(group);
+                foreach (var p in group)
+                {
+                    hashSet.Add(p);
+                }
+            }
+
+            return result;
+        }
+
+        private static IEnumerable<string> GetFullSubset(IDictionary<string, string[]> lookup, string[] subset, int iteration = 0)
+        {
+            if (iteration >= 4)
+                return subset;
+
+            subset = subset.Concat(subset.SelectMany(element => lookup[element])).Distinct().ToArray();
+            return GetFullSubset(lookup, subset, iteration+1);
         }
 
         public static Match[] GetPlayerMatches(string playerID, int limit, int days, int lobbyType)
