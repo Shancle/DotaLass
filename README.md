@@ -5,13 +5,13 @@ Dota 2 Personal Stats Assistant
 #### Features
 - Retrieve stats from all 10 players automatically when a match is found.
 - Calculates averages for the last 20~ games.
-- 15 different fields to choose from, see only the stats you care about.
+- 17 different fields to choose from, see only the stats you care about.
 - Quick links to player profiles and specific matches, straight to your preferred stats site (OpenDota/DotaBuff).
 - Custom Colour-Coded notes for players, remind yourself why someone was awesome, or why someone is muted.
 
 ![](http://i.imgur.com/0Mg1012.png)
 #### How to Use
-- Download the latest release [here](https://github.com/heartofimpetus/DotaLass/releases).
+- Download the latest release [here](https://github.com/Shancle/DotaLass/releases/).
 - Unzip & run DotaLass.exe
 - Either start a match of Dota 2 to automatically download stats for it's players or press the refresh button to load your last game's data.
 #### Customization
@@ -20,9 +20,11 @@ Pick which fields you want to see, from only ranked games and from which maximum
 #### Fields
 - Profile
 - Notes
+- Rank Tier
 - Solo MMR
 - Estimate MMR
 - Winrate
+- KDA
 - Kills
 - Deaths
 - Assists
@@ -39,4 +41,5 @@ There is no memory reading from the Dota 2 application and no risk of being bann
 #### Screenshots
 ![](http://i.imgur.com/aBVSTho.png)
 ![](http://i.imgur.com/nwHmt6L.png)
+![](https://i.imgur.com/ISr6hi7.png)
 ![](http://i.imgur.com/nrvllTQ.png)
